@@ -12,7 +12,8 @@ function setUpPanel(spoilerUI_Button) {
             panel.style.height = '100%';
             panel.style.backgroundColor = 'white';
             panel.style.zIndex = '9999';
-            panel.style.display = 'block'
+            panel.style.display = 'block';
+            panel.style.overflowY = 'auto';
 
             // Add a close button for the panel
             const closeButton = document.createElement('button');
@@ -24,18 +25,26 @@ function setUpPanel(spoilerUI_Button) {
             });
             panel.appendChild(closeButton);
 
-            // Fill the panel with the sources
-            const title = document.createElement('h2');
-            title.textContent = 'Spoiler Sources';
-            panel.appendChild(title);
+            // Fill the panel with the categories and sources
+            Object.entries(sources).forEach(([category, episodes]) => {
+                const details = document.createElement('details');
+                const summary = document.createElement('summary');
+                summary.textContent = category;
+                details.appendChild(summary);
 
-            const sourcesList = document.createElement('ul');
-            sources.forEach(source => {
-                const listItem = document.createElement('li');
-                listItem.textContent = source;
-                sourcesList.appendChild(listItem);
-            });
-            panel.appendChild(sourcesList);
+                const episodeList = document.createElement('ul');
+                episodes.forEach(episode => {
+                    const item = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `spoiler-${category}-${episode}`;
+                    item.appendChild(checkbox);
+                    item.appendChild(document.createTextNode(episode));
+                    episodeList.appendChild(item);
+                });
+                details.appendChild(episodeList);
+                panel.appendChild(details);
+            })
 
             document.body.appendChild(panel);
         } else {
@@ -61,5 +70,5 @@ function addSpoilerButton() {
     setUpPanel(spoilerUI_Button);
 }
 
-const sources = sourceScan();
+const sources = sources_Scan();
 addSpoilerButton();
