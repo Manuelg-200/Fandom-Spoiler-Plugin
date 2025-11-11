@@ -26,18 +26,23 @@ function setUpPanel(spoilerUI_Button) {
             panel.appendChild(closeButton);
 
             // Fill the panel with the categories and sources
-            Object.entries(sources).forEach(([category, episodes]) => {
+            Object.values(sources).forEach(category => {
                 const details = document.createElement('details');
                 const summary = document.createElement('summary');
-                summary.textContent = category;
+                summary.textContent = category.name;
                 details.appendChild(summary);
 
                 const episodeList = document.createElement('ul');
-                episodes.forEach(episode => {
+                Object.keys(category.seasons).forEach(episode => {
+                    const seasonDetails = document.createElement('details');
+                    const seasonSummary = document.createElement('summary');
+                    seasonSummary.textContent = `Season ${season}`;
+                    seasonDetails.appendChild(seasonSummary);
+
                     const item = document.createElement('li');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.id = `spoiler-${category}-${episode}`;
+                    checkbox.id = `spoiler-${category.name}-${season}x${episode}`;
                     item.appendChild(checkbox);
                     item.appendChild(document.createTextNode(episode));
                     episodeList.appendChild(item);

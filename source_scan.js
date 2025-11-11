@@ -11,21 +11,29 @@ function sources_Scan() {
                 if (!span.title.includes('(')) {
                     const category = span.title;
                     if (!sources[category]) {
-                        sources[category] = [];
-                        sources[category].push(span.textContent);
+                        sources[category] = {
+                            name: category,
+                            abbreviation: span.textContent,
+                            seasons: {}
+                        }
                     }
                 }
                 else {
                     const episode = span.title;
-                    const parentContent = span.title.match(/\(([^)]+)\)/);
-                    const categoryAbbreviation = parentContent[1].split(' ')[0];
-                    Object.entries(sources).forEach(([category, episodes]) => {
-                        if (episodes[0] === categoryAbbreviation) {
-                            if (!episodes.includes(episode)) {
-                                episodes.push(episode);
-                            }
+                    const parentContent = span.title.match(/\(([^)]+)\)/)[1];
+                    const parts = parentContent.split(' ');
+                    const currentAbbreviation = parts[0];
+                    const seasonEpisode = parts[1].split('x');
+                    const currentSeason = seasonEpisode[0];
+                    const currentEpisode = seasonEpisode[1];
+                    Object.values(sources).forEach(category => {
+                        if (category.abbreviation === currentAbbreviation) {
+                            if (!category.seasons[currentSeason]) 
+                                category.seasons[currentSeason] = [];
+                            if (!category.seasons[currentSeason].includes(currentEpisode))
+                                category.seasons[currentSeason].push(currentEpisode);
                         }
-                    })
+                    });
                 }
             });
         })
