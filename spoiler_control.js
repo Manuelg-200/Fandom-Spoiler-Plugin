@@ -25,30 +25,29 @@ function setUpPanel(spoilerUI_Button) {
             });
             panel.appendChild(closeButton);
 
-            // Fill the panel with the categories and sources
+            // Fill the panel with the categories, seasons and episodes
             Object.values(sources).forEach(category => {
-                const details = document.createElement('details');
-                const summary = document.createElement('summary');
-                summary.textContent = category.name;
-                details.appendChild(summary);
+                const categoryDetails = document.createElement('details');
+                const categorySummary = document.createElement('summary');
+                categorySummary.textContent = category.name;
+                categoryDetails.appendChild(categorySummary);
 
-                const episodeList = document.createElement('ul');
-                Object.keys(category.seasons).forEach(episode => {
+                const seasonList = document.createElement('ul');
+                Object.keys(category.seasons).forEach(season => {
                     const seasonDetails = document.createElement('details');
                     const seasonSummary = document.createElement('summary');
                     seasonSummary.textContent = `Season ${season}`;
                     seasonDetails.appendChild(seasonSummary);
+                    seasonList.appendChild(seasonDetails);
 
-                    const item = document.createElement('li');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = `spoiler-${category.name}-${season}x${episode}`;
-                    item.appendChild(checkbox);
-                    item.appendChild(document.createTextNode(episode));
-                    episodeList.appendChild(item);
+                    category.seasons[season].forEach(episode => {
+                        const episodeElement = document.createElement('li');
+                        episodeElement.appendChild(document.createTextNode(episode));
+                        seasonDetails.appendChild(episodeElement);
+                    });
                 });
-                details.appendChild(episodeList);
-                panel.appendChild(details);
+                categoryDetails.appendChild(seasonList);
+                panel.appendChild(categoryDetails);
             })
 
             document.body.appendChild(panel);
