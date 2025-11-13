@@ -4,13 +4,13 @@ function setUpPanel(spoilerUI_Button) {
         if(!panel) {
             // Add the panel itself
             panel = document.createElement('div');
-            panel.classList = "spoiler-control-panel";
+            panel.className = "spoiler-control-panel";
             panel.id = 'spoiler-control-panel';
 
             // Add a close button for the panel
             const closeButton = document.createElement('button');
             closeButton.textContent = 'Close';
-            closeButton.classList = "close-button";
+            closeButton.className = "close-button";
             closeButton.addEventListener('click', () => {
                 panel.style.display = 'none';
             });
@@ -18,10 +18,10 @@ function setUpPanel(spoilerUI_Button) {
 
             // Fill the panel with the categories, seasons and episodes
             Object.values(sources).forEach(category => {
-                categoryDetails = addDetails_and_checkbox(category.name)
+                const categoryDetails = addDetails_and_checkbox(category.name)
                 const seasonList = document.createElement('ul');
                 Object.keys(category.seasons).forEach(season => {
-                    seasonDetails = addDetails_and_checkbox(`Season ${season}`);
+                    const seasonDetails = addDetails_and_checkbox(`Season ${season}`);
                     seasonList.appendChild(seasonDetails);
                     category.seasons[season].forEach(episode => {
                         const episodeElement = document.createElement('li');
@@ -44,7 +44,7 @@ function setUpPanel(spoilerUI_Button) {
 function addSpoilerButton() {
     const spoiler_button = document.createElement('Button');
     spoiler_button.textContent = 'Spoilers control';
-    spoiler_button.classList = "spoiler-button";
+    spoiler_button.className = "spoiler-button";
     document.body.appendChild(spoiler_button);
     setUpPanel(spoiler_button);
 }
