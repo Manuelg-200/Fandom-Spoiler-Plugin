@@ -8,7 +8,8 @@
     "content_scripts": [
         {
             "matches": ["*://*.fandom.com/*"],
-            "js": ["source_scan.js", "spoiler_control.js"]
+            "js": ["source_scan.js", "spoiler_control.js"],
+            "css": ["panelStyle.css"]
         }
     ]
 }
