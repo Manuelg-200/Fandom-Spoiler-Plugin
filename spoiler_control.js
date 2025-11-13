@@ -21,13 +21,17 @@ function setUpPanel(spoilerUI_Button) {
                 const categoryDetails = addDetails_and_checkbox(category.name)
                 const seasonList = document.createElement('ul');
                 Object.keys(category.seasons).forEach(season => {
+                    const seasonElement = document.createElement('li');
+                    seasonList.appendChild(seasonElement);
                     const seasonDetails = addDetails_and_checkbox(`Season ${season}`);
-                    seasonList.appendChild(seasonDetails);
+                    seasonElement.appendChild(seasonDetails);
                     category.seasons[season].forEach(episode => {
+                        const episodeList = document.createElement('ul');
+                        seasonDetails.appendChild(episodeList);
                         const episodeElement = document.createElement('li');
                         episodeElement.appendChild(document.createTextNode(episode));
                         add_checkbox(episodeElement);
-                        seasonDetails.appendChild(episodeElement);
+                        episodeList.appendChild(episodeElement);
                     });
                 });
                 categoryDetails.appendChild(seasonList);
