@@ -22,3 +22,13 @@
     position: relative;
     left: 80%;
 }
+
+.season-list {
+    position: relative;
+    left: 5%;
+}
+
+.episode-list {
+    position: relative;
+    left: 10%;
+}
