@@ -30,24 +30,25 @@ function setUpPanel() {
         // Fill the panel with the categories, seasons and episodes
         // Follows this hierarchy: details > ul > li > details > ul > li
         // Categories
-        Object.values(sources).forEach(category => {
-            const categoryDetails = addDetails_and_checkbox(category.name)
+        Object.keys(sources).forEach(categoryName => {
+            const categoryDetails = addDetails_and_checkbox(categoryName);
+            const category = sources[categoryName];
 
             // Seasons for each category
             const seasonList = document.createElement('ul');
             seasonList.className = "season-list";
-            Object.keys(category.seasons).forEach(season => {
+            Object.keys(category.seasons).forEach(seasonNumber => {
                 const seasonElement = document.createElement('li');
                 seasonList.appendChild(seasonElement);
                 let seasonDetails;
                 if(category.name === "Movies")
-                    seasonDetails = addDetails_and_checkbox(`${season} Era`);
+                    seasonDetails = addDetails_and_checkbox(`${seasonNumber} Era`);
                 else
-                    seasonDetails = addDetails_and_checkbox(`Season ${season}`);
+                    seasonDetails = addDetails_and_checkbox(`Season ${seasonNumber}`);
                 seasonElement.appendChild(seasonDetails);
 
                 // Episodes for each season
-                category.seasons[season].forEach(episode => {
+                category.seasons[seasonNumber].forEach(episode => {
                     const episodeList = document.createElement('ul');
                     episodeList.className = "episode-list";
                     seasonDetails.appendChild(episodeList);

@@ -25,7 +25,6 @@ function Source_Scan() {
                     const categoryName = span.title;
                     if (!sources[categoryName]) {
                         sources[categoryName] = {
-                            name: categoryName,
                             abbreviation: span.textContent,
                             seasons: {}
                         };
