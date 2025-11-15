@@ -39,7 +39,11 @@ function setUpPanel() {
             Object.keys(category.seasons).forEach(season => {
                 const seasonElement = document.createElement('li');
                 seasonList.appendChild(seasonElement);
-                const seasonDetails = addDetails_and_checkbox(`Season ${season}`);
+                let seasonDetails;
+                if(category.name === "Movies")
+                    seasonDetails = addDetails_and_checkbox(`${season} Era`);
+                else
+                    seasonDetails = addDetails_and_checkbox(`Season ${season}`);
                 seasonElement.appendChild(seasonDetails);
 
                 // Episodes for each season

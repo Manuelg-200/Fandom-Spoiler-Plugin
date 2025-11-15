@@ -28,7 +28,7 @@ function Source_Scan() {
                             name: categoryName,
                             abbreviation: span.textContent,
                             seasons: {}
-                        }
+                        };
                     }
                 }
                 // The sources with parenthesis in the pop up <span> are single episodes or movies
@@ -42,6 +42,14 @@ function Source_Scan() {
                         add_episode(episodeData[1], sources)
                     // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
                     else {
+                        // Add the category for movies here, as it's a special case
+                        if(!sources["Movies"]) {
+                            sources["Movies"] = {
+                                name: "Movies",
+                                abbreviation: "FLM",
+                                seasons: {} // Actually used for the Era of the movie
+                            }
+                        }
                         movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
                         add_movie(movieData, sources)
                     }
@@ -90,7 +98,7 @@ function add_movie(movieData, sources) {
             if (!category.seasons[movie_era])
                 category.seasons[movie_era] = [];
             if (!category.seasons[movie_era].includes(movie_number))
-                category.seasons[movie_era].push(movie_era);
+                category.seasons[movie_era].push(movie_number);
         }
     })
 }
