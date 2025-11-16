@@ -1,3 +1,20 @@
+const CATEGORY_ORDER = [
+    "ENT", // Star Trek: Enterprise
+    "DIS", // Star Trek: Discovery
+    "SNW", // Star Trek: Strange New Worlds
+    "TOS", // Star Trek: The Original Series
+    "TAS", // Star Trek: The Animated Series
+    "TNG", // Star Trek: The Next Generation
+    "DS9", // Star Trek: Deep Space Nine
+    "VOY", // Star Trek: Voyager
+    "LD", // Star Trek: Lower Decks
+    "PRO", // Star Trek: Prodigy
+    "PIC", // Star Trek: Picard
+    "ST", // Star Trek: Short Treks
+    "VST", // Star Trek: very Short Treks
+    "FLM" // Movies
+]
+
 /**
  * Scans the page for sources in the main text
  * @returns the sources structure: category > seasons > episodes
@@ -6,7 +23,11 @@ function Source_Scan() {
     // mw-content-text is the id for the main text in fandom.org pages
     mainText = document.getElementById("mw-content-text");
     if (mainText) {
-        const sources = {};
+        const sources = new Map();
+        CATEGORY_ORDER.forEach(category => {
+            sources.set(category, "empty");
+        })
+
         const p_elements = mainText.querySelectorAll('p');
         p_elements.forEach(p => {
             // Select the <a> elements that link other wiki pages, these are the links to episodes/movies/series
@@ -22,12 +43,11 @@ function Source_Scan() {
 
                 // The sources with no parenthesis in the pop up <span> are entire series, for example: "Star Trek: The Next Generation"
                 if (!span.title.includes('(')) {
-                    let categoryName = span.title;
-                    if (!sources[categoryName]) {
-                        sources[categoryName] = {
-                            abbreviation: span.textContent,
+                    if (sources.get(span.textContent) === "empty") {
+                        sources.set(span.textContent, {
+                            title: span.title,
                             seasons: {}
-                        };
+                        });
                     }
                 }
                 // The sources with parenthesis in the pop up <span> are single episodes or movies
@@ -45,12 +65,11 @@ function Source_Scan() {
                     // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
                     else {
                         // Add the category for movies here, as it's a special case
-                        if(!sources["Movies"]) {
-                            sources["Movies"] = {
-                                name: "Movies",
-                                abbreviation: "FLM",
+                        if(sources.get("FLM") === "empty") {
+                            sources.set("FLM", {
+                                title: "Movies",
                                 seasons: {} // Actually used for the Era of the movie
-                            }
+                            });
                         }
                         let movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
                         let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
@@ -68,7 +87,7 @@ function Source_Scan() {
  * Adds an episode to the sources structure
  * @param episodeData: string structured like "TNG 1x09"
  * @param title: episode title string
- * @param sources: the sources structure 
+ * @param sources: the sources map 
  */
 function add_episode(episodeData, title, sources) {
     let episodeData_split = episodeData.split(' '); // "TNG" and "1x09"
@@ -77,33 +96,29 @@ function add_episode(episodeData, title, sources) {
     let season = season_and_episode[0]; // "1"
     let episode = season_and_episode[1]; // "09"
     let stringToAdd = `${episode}: ${title}`;
-    Object.values(sources).forEach(category => {
-        if (category.abbreviation === abbreviation) {
-            if (!category.seasons[season]) 
-                category.seasons[season] = [];
-            if (!category.seasons[season].includes(stringToAdd))
-                category.seasons[season].push(stringToAdd);
-        }
-        // Because all sources are structured like "TNG: "The Battle"", there is no need to check if the
-        // category is not present
-    });
+
+    let category = sources.get(abbreviation);
+    if(!category.seasons[season])
+        category.seasons[season] = [];
+    if(!category.seasons[season].includes(stringToAdd))
+        category.seasons[season].push(stringToAdd);
+    // Because all sources are structured like "TNG: "The Battle"", there is no need to check if the
+    // category is not present
 }
 
 /**
  * Adds a movie to the sources structure
  * @param movieData: string structured like "FLM 08, TNG 2"
  * @param title: movie title string
- * @param sources: the sources structure 
+ * @param sources: the sources map 
  */
 function add_movie(movieData, title, sources) {
     let movieData_split = movieData.split(', '); // "FLM 08" and "TNG 2"
     let movie_era = movieData_split[1].split(' ')[0]; // "TNG"
-    Object.values(sources).forEach(category =>  {
-        if (category.abbreviation === "FLM") {
-            if (!category.seasons[movie_era])
-                category.seasons[movie_era] = [];
-            if (!category.seasons[movie_era].includes(title))
-                category.seasons[movie_era].push(title);
-        }
-    })
+
+    let category = sources.get("FLM");
+    if(!category.seasons[movie_era])
+        category.seasons[movie_era] = [];
+    if(!category.seasons[movie_era].includes(title))
+        category.seasons[movie_era].push(title);
 }

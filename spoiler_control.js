@@ -30,38 +30,38 @@ function setUpPanel() {
         // Fill the panel with the categories, seasons and episodes
         // Follows this hierarchy: details > ul > li > details > ul > li
         // Categories
-        Object.keys(sources).forEach(categoryName => {
-            const categoryDetails = addDetails_and_checkbox(categoryName);
-            const category = sources[categoryName];
+        for(const category of sources.values()) {
+            if(category !== "empty") {
+                const categoryDetails = addDetails_and_checkbox(category.title);
 
-            // Seasons for each category
-            const seasonList = document.createElement('ul');
-            seasonList.className = "season-list";
-            Object.keys(category.seasons).forEach(seasonNumber => {
-                const seasonElement = document.createElement('li');
-                seasonList.appendChild(seasonElement);
-                let seasonDetails;
-                if(category.name === "Movies")
-                    seasonDetails = addDetails_and_checkbox(`${seasonNumber} Era`);
-                else
-                    seasonDetails = addDetails_and_checkbox(`Season ${seasonNumber}`);
-                seasonElement.appendChild(seasonDetails);
+                // Seasons for each category
+                const seasonList = document.createElement('ul');
+                seasonList.className = "season-list";
+                Object.keys(category.seasons).forEach(seasonNumber => {
+                    const seasonElement = document.createElement('li');
+                    seasonList.appendChild(seasonElement);
+                    let seasonDetails;
+                    if (category === "Movies")
+                        seasonDetails = addDetails_and_checkbox(`${seasonNumber} Era`);
+                    else
+                        seasonDetails = addDetails_and_checkbox(`Season ${seasonNumber}`);
+                    seasonElement.appendChild(seasonDetails);
 
-                // Episodes for each season
-                category.seasons[seasonNumber].forEach(episode => {
-                    const episodeList = document.createElement('ul');
-                    episodeList.className = "episode-list";
-                    seasonDetails.appendChild(episodeList);
-                    const episodeElement = document.createElement('li');
-                    episodeElement.appendChild(document.createTextNode(episode));
-                    add_checkbox(episodeElement);
-                    episodeList.appendChild(episodeElement);
+                    // Episodes for each season
+                    category.seasons[seasonNumber].forEach(episode => {
+                        const episodeList = document.createElement('ul');
+                        episodeList.className = "episode-list";
+                        seasonDetails.appendChild(episodeList);
+                        const episodeElement = document.createElement('li');
+                        episodeElement.appendChild(document.createTextNode(episode));
+                        add_checkbox(episodeElement);
+                        episodeList.appendChild(episodeElement);
+                    });
                 });
-            });
-            categoryDetails.appendChild(seasonList);
-            panel.appendChild(categoryDetails);
-        })
-
+                categoryDetails.appendChild(seasonList);
+                panel.appendChild(categoryDetails);
+            }
+        }
         document.body.appendChild(panel);
     } else {
         // Panel is already set up
