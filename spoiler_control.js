@@ -41,7 +41,7 @@ function setUpPanel() {
                     const seasonElement = document.createElement('li');
                     seasonList.appendChild(seasonElement);
                     let seasonDetails;
-                    if (category === "Movies")
+                    if (category.title === "Movies")
                         seasonDetails = addDetails_and_checkbox(`${seasonNumber} Era`);
                     else
                         seasonDetails = addDetails_and_checkbox(`Season ${seasonNumber}`);
