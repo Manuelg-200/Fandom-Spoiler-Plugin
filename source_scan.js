@@ -15,6 +15,13 @@ const CATEGORY_ORDER = [
     "FLM" // Movies
 ]
 
+const MOVIE_ORDER = [
+    "TOS", // The Original Series
+    "TNG", // The Next Generation
+    "AR", // Alernate Reality (Kelvin Timeline)
+    "Other" // Other
+]
+
 /**
  * Scans the page for sources in the main text
  * @returns the sources structure: category > seasons > episodes
@@ -101,7 +108,7 @@ function add_episode(episodeData, title, sources) {
     if(!category.seasons[season])
         category.seasons[season] = [];
     if(!category.seasons[season].includes(stringToAdd))
-        category.seasons[season].push(stringToAdd);
+        category.seasons[season][parseInt(episode, 10)] = stringToAdd;
     // Because all sources are structured like "TNG: "The Battle"", there is no need to check if the
     // category is not present
 }
@@ -114,11 +121,14 @@ function add_episode(episodeData, title, sources) {
  */
 function add_movie(movieData, title, sources) {
     let movieData_split = movieData.split(', '); // "FLM 08" and "TNG 2"
-    let movie_era = movieData_split[1].split(' ')[0]; // "TNG"
+    let movie_era_and_number = movieData_split[1].split(' '); // "TNG" and "2"
+    let movie_era = movie_era_and_number[0]; // "TNG"
+    let movie_number = movie_era_and_number[1]; // "2"
 
     let category = sources.get("FLM");
-    if(!category.seasons[movie_era])
-        category.seasons[movie_era] = [];
-    if(!category.seasons[movie_era].includes(title))
-        category.seasons[movie_era].push(title);
+    let index = MOVIE_ORDER.indexOf(movie_era);
+    if(!category.seasons[index])
+        category.seasons[index] = [];
+    if(!category.seasons[index].includes(title)) 
+        category.seasons[index][movie_number] = title;
 }
