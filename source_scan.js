@@ -68,7 +68,7 @@ function Source_Scan() {
 
                     // Episode case example: "The Battle (TNG 1x09)"
                     if (episodeData)
-                        add_episode(episodeData[1], title, sources)
+                        add_episode(episodeData[1], title, p, sources)
                     // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
                     else {
                         // Add the category for movies here, as it's a special case
@@ -80,7 +80,7 @@ function Source_Scan() {
                         }
                         let movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
                         let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
-                        add_movie(movieData, title, sources)
+                        add_movie(movieData, title, p, sources)
                     }
                 }
             });
@@ -94,9 +94,10 @@ function Source_Scan() {
  * Adds an episode to the sources structure
  * @param episodeData: string structured like "TNG 1x09"
  * @param title: episode title string
+ * @param paragraph: the corresponding HTML p element to the source
  * @param sources: the sources map 
  */
-function add_episode(episodeData, title, sources) {
+function add_episode(episodeData, title, paragraph, sources) {
     let episodeData_split = episodeData.split(' '); // "TNG" and "1x09"
     let abbreviation = episodeData_split[0]; // "TNG"
     let season_and_episode = episodeData_split[1].split('x'); // "1" and "09"
@@ -106,9 +107,9 @@ function add_episode(episodeData, title, sources) {
 
     let category = sources.get(abbreviation);
     if(!category.seasons[season])
-        category.seasons[season] = [];
-    if(!category.seasons[season].includes(stringToAdd))
-        category.seasons[season][parseInt(episode, 10)] = stringToAdd;
+        category.seasons[season] = new Map();
+    if(!category.seasons[season].get(stringToAdd))
+        category.seasons[season].set(parseInt(episode, 10), [stringToAdd, paragraph]);
     // Because all sources are structured like "TNG: "The Battle"", there is no need to check if the
     // category is not present
 }
@@ -117,9 +118,10 @@ function add_episode(episodeData, title, sources) {
  * Adds a movie to the sources structure
  * @param movieData: string structured like "FLM 08, TNG 2"
  * @param title: movie title string
+ * @param paragraph: the corresponding HTML p element to the source
  * @param sources: the sources map 
  */
-function add_movie(movieData, title, sources) {
+function add_movie(movieData, title, paragraph, sources) {
     let movieData_split = movieData.split(', '); // "FLM 08" and "TNG 2"
     let movie_era_and_number = movieData_split[1].split(' '); // "TNG" and "2"
     let movie_era = movie_era_and_number[0]; // "TNG"
@@ -128,7 +130,7 @@ function add_movie(movieData, title, sources) {
     let category = sources.get("FLM");
     let index = MOVIE_ORDER.indexOf(movie_era);
     if(!category.seasons[index])
-        category.seasons[index] = [];
-    if(!category.seasons[index].includes(title)) 
-        category.seasons[index][movie_number] = title;
+        category.seasons[index] = new Map();
+    if(!category.seasons[index].get(title)) 
+        category.seasons[index].set(movie_number, [title, paragraph]);
 }

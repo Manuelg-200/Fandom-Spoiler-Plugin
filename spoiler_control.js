@@ -55,15 +55,15 @@ function setUpPanel() {
                     seasonElement.appendChild(seasonDetails);
 
                     // Episodes for each season
-                    category.seasons[seasonNumber].forEach(episode => {
+                    for(const episode of category.seasons[seasonNumber].values()) {
                         const episodeList = document.createElement('ul');
                         episodeList.className = "episode-list";
                         seasonDetails.appendChild(episodeList);
                         const episodeElement = document.createElement('li');
-                        episodeElement.appendChild(document.createTextNode(episode));
+                        episodeElement.appendChild(document.createTextNode(episode[0]));
                         add_checkbox(episodeElement);
                         episodeList.appendChild(episodeElement);
-                    });
+                    }
                 });
                 categoryDetails.appendChild(seasonList);
                 panel.appendChild(categoryDetails);
