@@ -1,6 +1,6 @@
 const MOVIE_ERA_NAMES = {
-    0: "The Original Series",
-    1: "The Next Generation",
+    0: "The Original Series era",
+    1: "The Next Generation era",
     2: "Kelvin Timeline",
     3: "Other"
 }
@@ -49,7 +49,7 @@ function setUpPanel() {
                     seasonList.appendChild(seasonElement);
                     let seasonDetails;
                     if (category.title === "Movies")
-                        seasonDetails = addDetails_and_checkbox(`${MOVIE_ERA_NAMES[seasonNumber]} Era`);
+                        seasonDetails = addDetails_and_checkbox(MOVIE_ERA_NAMES[seasonNumber]);
                     else
                         seasonDetails = addDetails_and_checkbox(`Season ${seasonNumber}`);
                     seasonElement.appendChild(seasonDetails);
