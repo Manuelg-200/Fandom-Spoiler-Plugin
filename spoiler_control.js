@@ -37,9 +37,11 @@ function setUpPanel() {
         // Fill the panel with the categories, seasons and episodes
         // Follows this hierarchy: details > ul > li > details > ul > li
         // Categories
-        for(const category of sources.values()) {
+        for(let category of sources.values()) {
             if(category !== "empty") {
-                const categoryDetails = addDetails_and_checkbox(category.title);
+                const categoryCheckbox = addCheckbox();
+                const categoryDetails = addDetailsWithCheckbox(category.title, categoryCheckbox);
+                addMenuListener(categoryDetails, categoryCheckbox);
 
                 // Seasons for each category
                 const seasonList = document.createElement('ul');
@@ -48,20 +50,22 @@ function setUpPanel() {
                     const seasonElement = document.createElement('li');
                     seasonList.appendChild(seasonElement);
                     let seasonDetails;
+                    const seasonCheckbox = addCheckbox();
                     if (category.title === "Movies")
-                        seasonDetails = addDetails_and_checkbox(MOVIE_ERA_NAMES[seasonNumber]);
+                        seasonDetails = addDetailsWithCheckbox(MOVIE_ERA_NAMES[seasonNumber], seasonCheckbox);
                     else
-                        seasonDetails = addDetails_and_checkbox(`Season ${seasonNumber}`);
+                        seasonDetails = addDetailsWithCheckbox(`Season ${seasonNumber}`, seasonCheckbox);
+                    addMenuListener(seasonDetails, seasonCheckbox);
                     seasonElement.appendChild(seasonDetails);
 
                     // Episodes for each season
-                    for(const episode of category.seasons[seasonNumber].values()) {
+                    for(let episode of category.seasons[seasonNumber].values()) {
                         const episodeList = document.createElement('ul');
                         episodeList.className = "episode-list";
                         seasonDetails.appendChild(episodeList);
                         const episodeElement = document.createElement('li');
                         episodeElement.appendChild(document.createTextNode(episode[0]));
-                        add_checkbox(episodeElement);
+                        addCheckbox(episodeElement);
                         episodeList.appendChild(episodeElement);
                     }
                 });
@@ -77,27 +81,41 @@ function setUpPanel() {
 }
 
 /**
+ * Creates a checkbox element
+ * @returns the checkbox element
+ */
+function addCheckbox() {
+    const checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    return checkbox;
+}
+
+/**
  * Adds a details element with a checkbox in its summary element
- * @param summaryText: the text displayed on screen 
+ * @param summaryText: the text displayed on screen
+ * @param checkbox: the checkbox to include
  * @returns the added details element
  */
-function addDetails_and_checkbox(summaryText) {
+function addDetailsWithCheckbox(summaryText, checkbox) {
     const details = document.createElement('details');
-    const summary = document.createElement('summary');    
-    summary.textContent = summaryText;
+    const summary = document.createElement('summary');
     details.appendChild(summary);
-    add_checkbox(summary)
+    summary.textContent = summaryText;
+    summary.insertBefore(checkbox, summary.firstChild);
     return details;
 }
 
 /**
- * Adds a checkbox input element
- * @param fatherElement: the element that the checkbox is going to be appended to
+ * Adds a listener to the checkbox of a menu to select or unselect ALL the child elements checkboxes 
+ * @param details: the father details element of the checkbox
+ * @param checkbox: the checkbox
  */
-function add_checkbox(fatherElement) {
-    const checkbox = document.createElement('input');
-    checkbox.type = "checkbox";
-    fatherElement.insertBefore(checkbox, fatherElement.firstChild);
+function addMenuListener(details, checkbox) {
+    checkbox.addEventListener('change', () => {
+        let list = details.querySelector('[class$="-list"]');
+        for(let child_checkbox of list.querySelectorAll("input"))
+            child_checkbox.checked = checkbox.checked;
+    });
 }
 
 // Main
