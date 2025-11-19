@@ -65,7 +65,8 @@ function setUpPanel() {
                         seasonDetails.appendChild(episodeList);
                         const episodeElement = document.createElement('li');
                         episodeElement.appendChild(document.createTextNode(episode[0]));
-                        addCheckbox(episodeElement);
+                        const episodeCheckbox = addCheckbox(episodeElement);
+                        episodeElement.insertBefore(episodeCheckbox, episodeElement.firstChild);
                         episodeList.appendChild(episodeElement);
                     }
                 });
