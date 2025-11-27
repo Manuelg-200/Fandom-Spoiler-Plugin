@@ -53,7 +53,7 @@ function Source_Scan() {
                     if (sources.get(span.textContent) === "empty") {
                         sources.set(span.textContent, {
                             title: span.title,
-                            seasons: {}
+                            seasons: []
                         });
                     }
                 }
@@ -75,7 +75,7 @@ function Source_Scan() {
                         if(sources.get("FLM") === "empty") {
                             sources.set("FLM", {
                                 title: "Movies",
-                                seasons: {} // Actually used for the Era of the movie
+                                seasons: [] // Actually used for the Era of the movie
                             });
                         }
                         let movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
@@ -84,6 +84,18 @@ function Source_Scan() {
                     }
                 }
             });
+        })
+        // Sort the episode maps to be in episode order
+        CATEGORY_ORDER.forEach(abbreviation => {
+            if(abbreviation !== "FLM") {
+                let category = sources.get(abbreviation);
+                if(category !== "empty") {
+                    Object.keys(category.seasons).forEach(season => {
+                        let episodeMap = category.seasons[season];
+                        category.seasons[season] = new Map([...episodeMap.entries()].sort((a,b) => a[0] - b[0]));
+                    })
+                }
+            }
         })
         return sources;
     }

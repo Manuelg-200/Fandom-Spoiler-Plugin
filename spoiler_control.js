@@ -59,6 +59,7 @@ function setUpPanel() {
                     seasonElement.appendChild(seasonDetails);
 
                     // Episodes for each season
+                    // Values are structured in an array of two elements: 0=the string to show in the UI; 1=the paragraph to hide or show
                     for(let episode of category.seasons[seasonNumber].values()) {
                         const episodeList = document.createElement('ul');
                         episodeList.className = "episode-list";
@@ -68,6 +69,7 @@ function setUpPanel() {
                         const episodeCheckbox = addCheckbox(episodeElement);
                         episodeElement.insertBefore(episodeCheckbox, episodeElement.firstChild);
                         episodeList.appendChild(episodeElement);
+                        addSpoilerListener(episodeCheckbox, episode[1]);
                     }
                 });
                 categoryDetails.appendChild(seasonList);
@@ -116,6 +118,17 @@ function addMenuListener(details, checkbox) {
         let list = details.querySelector('[class$="-list"]');
         for(let child_checkbox of list.querySelectorAll("input"))
             child_checkbox.checked = checkbox.checked;
+    });
+}
+
+/**
+ * Adds a listener to the episode checkbox that blurs or unblurs the corresponding p html element
+ * @param checkbox: the checkbox to add the listener to 
+ * @param paragraph: the corresponding p HTML element 
+ */
+function addSpoilerListener(checkbox, paragraph) {
+    checkbox.addEventListener('change', () => {
+        paragraph.classList.toggle("blur", !checkbox.checked)
     });
 }
 
