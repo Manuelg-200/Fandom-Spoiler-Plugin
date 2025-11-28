@@ -115,13 +115,16 @@ function add_episode(episodeData, title, paragraph, sources) {
     let season_and_episode = episodeData_split[1].split('x'); // "1" and "09"
     let season = season_and_episode[0]; // "1"
     let episode = season_and_episode[1]; // "09"
+    let parsedEpisode = parseInt(episode, 10);
     let stringToAdd = `${episode}: ${title}`;
 
     let category = sources.get(abbreviation);
     if(!category.seasons[season])
         category.seasons[season] = new Map();
-    if(!category.seasons[season].get(stringToAdd))
-        category.seasons[season].set(parseInt(episode, 10), [stringToAdd, paragraph]);
+    if(!category.seasons[season].get(parsedEpisode))
+        category.seasons[season].set(parsedEpisode, [stringToAdd, paragraph]);
+    else
+        category.seasons[season].get(parsedEpisode).push(paragraph);
     // Because all sources are structured like "TNG: "The Battle"", there is no need to check if the
     // category is not present
 }

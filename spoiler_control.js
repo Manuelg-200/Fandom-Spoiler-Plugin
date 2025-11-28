@@ -69,7 +69,7 @@ function setUpPanel() {
                         const episodeCheckbox = addCheckbox(episodeElement);
                         episodeElement.insertBefore(episodeCheckbox, episodeElement.firstChild);
                         episodeList.appendChild(episodeElement);
-                        addSpoilerListener(episodeCheckbox, episode[1]);
+                        addSpoilerListener(episodeCheckbox, episode.slice(1));
                     }
                 });
                 categoryDetails.appendChild(seasonList);
@@ -124,10 +124,11 @@ function addMenuListener(details, checkbox) {
 /**
  * Adds a listener to the episode checkbox that blurs or unblurs the corresponding p html element
  * @param checkbox: the checkbox to add the listener to 
- * @param paragraph: the corresponding p HTML element 
+ * @param paragraphList: the corresponding p HTML elements
  */
-function addSpoilerListener(checkbox, paragraph) {
+function addSpoilerListener(checkbox, paragraphList) {
     checkbox.addEventListener('change', () => {
+        for(let paragraph of paragraphList)
         paragraph.classList.toggle("blur", !checkbox.checked)
     });
 }
