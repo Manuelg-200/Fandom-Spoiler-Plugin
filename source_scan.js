@@ -138,9 +138,9 @@ function add_episode(episodeData, title, paragraph, sources) {
     if(!category.seasons[season])
         category.seasons[season] = new Map();
     if(!category.seasons[season].get(parsedEpisode))
-        category.seasons[season].set(parsedEpisode, [stringToAdd, paragraph]);
+        category.seasons[season].set(parsedEpisode, {ep_info: stringToAdd, paragraph_list: []});
     else
-        category.seasons[season].get(parsedEpisode).push(paragraph);
+        category.seasons[season].get(parsedEpisode).paragraph_list.push(paragraph);
     // Because all sources are structured like "TNG: "The Battle"", there is no need to check if the
     // category is not present
 }
@@ -163,5 +163,7 @@ function add_movie(movieData, title, paragraph, sources) {
     if(!category.seasons[index])
         category.seasons[index] = new Map();
     if(!category.seasons[index].get(title)) 
-        category.seasons[index].set(movie_number, [title, paragraph]);
+        category.seasons[index].set(movie_number, {ep_info: title, paragraph_list: []});
+    else
+        category.seasons[index].get(title).paragraph_list.push(paragraph);
 }
