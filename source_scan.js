@@ -22,6 +22,10 @@ const MOVIE_ORDER = [
     "Other" // Other
 ]
 
+// Keeps count of the number of sources each paragraph has, to be used later so that to unblur 
+// a paragraph ALL the related sources must be selected
+const paragraphSourceCounter = new Map();
+
 /**
  * Scans the page for sources in the main text
  * @returns the sources structure: category > seasons > episodes
@@ -33,7 +37,7 @@ function Source_Scan() {
         const sources = new Map();
         CATEGORY_ORDER.forEach(category => {
             sources.set(category, "empty");
-        })
+        });
 
         const p_elements = mainText.querySelectorAll('p');
         p_elements.forEach(p => {
@@ -41,12 +45,19 @@ function Source_Scan() {
             // that are sources to the current paragraph. The <span> element is the small pop up description
             // that appears when hovering over a source.
             const sourceElements = p.querySelectorAll('a[href^="/wiki/"] > span');
+            // No need to check if the paragraphs are already present as it's impossible with the iteration of the p elements
+
+            // Used for paragraphs with more than one source: if ALL the sources are selected (initial = current), then it will show the paragraph
+            paragraphSourceCounter.set(p, {initial: 0, current: 0});
+            let counter = 0;
 
             // Handle each source
             sourceElements.forEach(span => {
                 // Exlude these two tags that use the same a > span elements as the sources
-                if (span.textContent === "edit" || span.textContent === "citation needed")
+                if (span.textContent === "edit" || span.textContent === "citation needed") {
+                    paragraphSourceCounter.delete(p);
                     return;
+                }
 
                 // The sources with no parenthesis in the pop up <span> are entire series, for example: "Star Trek: The Next Generation"
                 if (!span.title.includes('(')) {
@@ -67,8 +78,10 @@ function Source_Scan() {
                     let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
 
                     // Episode case example: "The Battle (TNG 1x09)"
-                    if (episodeData)
+                    if (episodeData) {
                         add_episode(episodeData[1], title, p, sources)
+                        counter++;
+                    }
                     // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
                     else {
                         // Add the category for movies here, as it's a special case
@@ -81,9 +94,12 @@ function Source_Scan() {
                         let movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
                         let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
                         add_movie(movieData, title, p, sources)
+                        counter++;
                     }
                 }
             });
+            paragraphSourceCounter.get(p).initial = counter;
+            paragraphSourceCounter.get(p).current = counter;
         })
         // Sort the episode maps to be in episode order
         CATEGORY_ORDER.forEach(abbreviation => {
