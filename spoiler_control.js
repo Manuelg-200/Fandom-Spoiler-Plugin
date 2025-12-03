@@ -38,7 +38,7 @@ function setUpPanel() {
         // Follows this hierarchy: details > ul > li > details > ul > li
         // Categories
         for(let category of sources.values()) {
-            if(category !== "empty") {
+            if(category) {
                 const categoryCheckbox = addCheckbox();
                 const categoryDetails = addDetailsWithCheckbox(category.title, categoryCheckbox);
                 addMenuListener(categoryDetails, categoryCheckbox);

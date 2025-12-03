@@ -36,7 +36,7 @@ function Source_Scan() {
     if (mainText) {
         const sources = new Map();
         CATEGORY_ORDER.forEach(category => {
-            sources.set(category, "empty");
+            sources.set(category);
         });
 
         const p_elements = mainText.querySelectorAll('p');
@@ -61,7 +61,7 @@ function Source_Scan() {
 
                 // The sources with no parenthesis in the pop up <span> are entire series, for example: "Star Trek: The Next Generation"
                 if (!span.title.includes('(')) {
-                    if (sources.get(span.textContent) === "empty") {
+                    if (!sources.get(span.textContent)) {
                         sources.set(span.textContent, {
                             title: span.title,
                             seasons: []
@@ -85,7 +85,7 @@ function Source_Scan() {
                     // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
                     else {
                         // Add the category for movies here, as it's a special case
-                        if(sources.get("FLM") === "empty") {
+                        if(!sources.get("FLM")) {
                             sources.set("FLM", {
                                 title: "Movies",
                                 seasons: [] // Actually used for the Era of the movie
@@ -105,7 +105,7 @@ function Source_Scan() {
         CATEGORY_ORDER.forEach(abbreviation => {
             if(abbreviation !== "FLM") {
                 let category = sources.get(abbreviation);
-                if(category !== "empty") {
+                if(category) {
                     Object.keys(category.seasons).forEach(season => {
                         let episodeMap = category.seasons[season];
                         category.seasons[season] = new Map([...episodeMap.entries()].sort((a,b) => a[0] - b[0]));
