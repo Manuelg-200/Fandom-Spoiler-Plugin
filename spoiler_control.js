@@ -41,7 +41,7 @@ function setUpPanel() {
             if(category) {
                 const categoryCheckbox = addCheckbox();
                 const categoryDetails = addDetailsWithCheckbox(category.title, categoryCheckbox);
-                addMenuListener(categoryDetails, categoryCheckbox);
+                addCategoryListener(categoryDetails, categoryCheckbox);
 
                 // Seasons for each category
                 const seasonList = document.createElement('ul');
@@ -55,14 +55,14 @@ function setUpPanel() {
                         seasonDetails = addDetailsWithCheckbox(MOVIE_ERA_NAMES[seasonNumber], seasonCheckbox);
                     else
                         seasonDetails = addDetailsWithCheckbox(`Season ${seasonNumber}`, seasonCheckbox);
-                    addMenuListener(seasonDetails, seasonCheckbox);
+                    addSeasonListener(seasonDetails, seasonCheckbox);
                     seasonElement.appendChild(seasonDetails);
 
                     // Episodes for each season
                     // Values are structured in an array of two elements: 0=the string to show in the UI; 1,2,3...=the paragraphs to hide or show
                     for(let episode of category.seasons[seasonNumber].values()) {
                         const episodeList = document.createElement('ul');
-                        episodeList.className = "episode-list";
+                        episodeList.className = "episode-element";
                         seasonDetails.appendChild(episodeList);
                         const episodeElement = document.createElement('li');
                         episodeElement.appendChild(document.createTextNode(episode.ep_info));
@@ -110,15 +110,33 @@ function addDetailsWithCheckbox(summaryText, checkbox) {
 }
 
 /**
- * Adds a listener to the checkbox of a menu to select or unselect ALL the child elements checkboxes 
+ * Adds a listener to the checkbox of a category to select or unselect ALL the child elements checkboxes 
  * @param details: the father details element of the checkbox
  * @param checkbox: the checkbox
  */
-function addMenuListener(details, checkbox) {
+function addCategoryListener(details, checkbox) {
     checkbox.addEventListener('change', () => {
-        let list = details.querySelector('[class$="-list"]');
-        for(let child_checkbox of list.querySelectorAll("input"))
+        let list = details.querySelector('.season-list');
+        for(let child_checkbox of list.querySelectorAll('input')) {
             child_checkbox.checked = checkbox.checked;
+            child_checkbox.dispatchEvent(new Event('change', {bubbles: true}));
+        }
+    });
+}
+
+/**
+ * Adds a listener to the checkbox of a season to select or unselect ALL the child elements checkboxes 
+ * @param details: the father details element of the checkbox
+ * @param checkbox: the checkbox
+ */
+function addSeasonListener(details, checkbox) {
+    checkbox.addEventListener('change', () => {
+        let episodes = details.querySelectorAll('.episode-element');
+        for(let episode of episodes) {
+            let child_checkbox = episode.querySelector('input');
+            child_checkbox.checked = checkbox.checked;
+            child_checkbox.dispatchEvent(new Event('change', {bubbles: true}));
+        }
     });
 }
 
@@ -132,6 +150,7 @@ function addSpoilerListener(checkbox, paragraphList) {
         for(let paragraph of paragraphList) {
             let sourceCount = paragraphSourceCounter.get(paragraph);
             checkbox.checked ? sourceCount.current++ : sourceCount.current--;
+            console.log("current: " + sourceCount.current + " initial: " + sourceCount.initial);
             paragraph.classList.toggle("blur", sourceCount.initial !== sourceCount.current);
         }
     });
