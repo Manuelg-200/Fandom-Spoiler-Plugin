@@ -117,9 +117,10 @@ function addDetailsWithCheckbox(summaryText, checkbox) {
 function addCategoryListener(details, checkbox) {
     checkbox.addEventListener('change', () => {
         let list = details.querySelector('.season-list');
-        for(let child_checkbox of list.querySelectorAll('input')) {
-            child_checkbox.checked = checkbox.checked;
-            child_checkbox.dispatchEvent(new Event('change', {bubbles: true}));
+        // summary > input is to select only the season checkboxes, ignoring the episode checkboxes, otherwise causes double event dispatch
+        for(let season_checkbox of list.querySelectorAll('summary > input')) {
+            season_checkbox.checked = checkbox.checked;
+            season_checkbox.dispatchEvent(new Event('change', {bubbles: true}));
         }
     });
 }
@@ -133,9 +134,9 @@ function addSeasonListener(details, checkbox) {
     checkbox.addEventListener('change', () => {
         let episodes = details.querySelectorAll('.episode-element');
         for(let episode of episodes) {
-            let child_checkbox = episode.querySelector('input');
-            child_checkbox.checked = checkbox.checked;
-            child_checkbox.dispatchEvent(new Event('change', {bubbles: true}));
+            let episode_checkbox = episode.querySelector('input');
+            episode_checkbox.checked = checkbox.checked;
+            episode_checkbox.dispatchEvent(new Event('change', {bubbles: true}));
         }
     });
 }
