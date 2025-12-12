@@ -40,6 +40,8 @@ function Source_Scan() {
         });
 
         const p_elements = mainText.querySelectorAll('p');
+        // Used to store paragraphs that have no sources that need to be added together with the next paragraphs
+        let toAddLater = []; 
         p_elements.forEach(p => {
             // Select the <a> elements that link other wiki pages, these are the links to episodes/movies/series
             // that are sources to the current paragraph. The <span> element is the small pop up description
@@ -47,62 +49,78 @@ function Source_Scan() {
             const sourceElements = p.querySelectorAll('a[href^="/wiki/"] > span');
             // No need to check if the paragraphs are already present as it's impossible with the iteration of the p elements
 
-            // Used for paragraphs with more than one source: if ALL the sources are selected (initial = current), then it will show the paragraph
-            paragraphSourceCounter.set(p, {initial: 0, current: 0});
-            let counter = 0;
+            if (sourceElements.length === 0) {
+                // Paragraph has no sources and needs to be added together with next one(s)
+                toAddLater.push(p);
+                // Used for paragraphs with more than one source: if ALL the sources are selected (initial = current), then it will show the paragraph
+                paragraphSourceCounter.set(p, { initial: 0, current: 0 });
+            }
+            else {
+                paragraphSourceCounter.set(p, { initial: 0, current: 0 });
+                let counter = 0;
 
-            // Handle each source
-            sourceElements.forEach(span => {
-                // Exlude these two tags that use the same a > span elements as the sources
-                if (span.textContent === "edit" || span.textContent === "citation needed") {
-                    paragraphSourceCounter.delete(p);
-                    return;
-                }
-
-                // The sources with no parenthesis in the pop up <span> are entire series, for example: "Star Trek: The Next Generation"
-                if (!span.title.includes('(')) {
-                    if (!sources.get(span.textContent)) {
-                        sources.set(span.textContent, {
-                            title: span.title,
-                            seasons: []
-                        });
+                // Handle each source
+                sourceElements.forEach(span => {
+                    // Exlude these two tags that use the same a > span elements as the sources
+                    if (span.textContent === "edit" || span.textContent === "citation needed") {
+                        paragraphSourceCounter.delete(p);
+                        return;
                     }
-                }
-                // The sources with parenthesis in the pop up <span> are single episodes or movies
-                else {
-                    // The regex separates the episodes from the movies, by checking what is in the parenthesis
-                    // Important to have the "x" as well, as in the case of episodes from different series but with the same title
-                    // their pop up <span> will have a second parenthesis indicating which series they are from, for example: "Anomaly (DIS) (DIS 4x02)"
-                    let episodeData = span.title.match(/\(([^)]*x[^)]*)\)/);
-                    // Removes what's between parenthesis to isolate the title
-                    let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
 
-                    // Episode case example: "The Battle (TNG 1x09)"
-                    if (episodeData) {
-                        let episode = add_episode(episodeData[1], title, sources);
-                        episode.paragraph_list.push(p);
-                        counter++;
-                    }
-                    // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
-                    else {
-                        // Add the category for movies here, as it's a special case
-                        if(!sources.get("FLM")) {
-                            sources.set("FLM", {
-                                title: "Movies",
-                                seasons: [] // Actually used for the Era of the movie
+                    // The sources with no parenthesis in the pop up <span> are entire series, for example: "Star Trek: The Next Generation"
+                    if (!span.title.includes('(')) {
+                        if (!sources.get(span.textContent)) {
+                            sources.set(span.textContent, {
+                                title: span.title,
+                                seasons: []
                             });
                         }
-                        let movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
-                        let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
-                        let movie = add_movie(movieData, title, p, sources)
-                        movie.paragraph_list.push(p);
-                        counter++;
                     }
-                }
-            });
-            paragraphSourceCounter.get(p).initial = counter;
-            paragraphSourceCounter.get(p).current = counter;
-        })
+                    // The sources with parenthesis in the pop up <span> are single episodes or movies
+                    else {
+                        // The regex separates the episodes from the movies, by checking what is in the parenthesis
+                        // Important to have the "x" as well, as in the case of episodes from different series but with the same title
+                        // their pop up <span> will have a second parenthesis indicating which series they are from, for example: "Anomaly (DIS) (DIS 4x02)"
+                        let episodeData = span.title.match(/\(([^)]*x[^)]*)\)/);
+                        // Removes what's between parenthesis to isolate the title
+                        let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
+
+                        // Episode case example: "The Battle (TNG 1x09)"
+                        if (episodeData) {
+                            let episode = add_episode(episodeData[1], title, sources);
+                            episode.paragraph_list.push(p);
+                            // Add the previous paragraphs that had no source as well and reset the array
+                            if(toAddLater.length !== 0) {
+                                episode.paragraph_list.push(...toAddLater);
+                                toAddLater = [];
+                            }
+                            counter++;
+                        }
+                        // Movie case example: "Star Trek: First Contact (FLM 08, TNG 2)"
+                        else {
+                            // Add the category for movies here, as it's a special case
+                            if (!sources.get("FLM")) {
+                                sources.set("FLM", {
+                                    title: "Movies",
+                                    seasons: [] // Actually used for the Era of the movie
+                                });
+                            }
+                            let movieData = span.title.match(/\(([^)]+)\)/)[1]; // "FLM 08, TNG 2"
+                            let title = span.title.replace(/\s*\([^)]*\)\s*$/, "");
+                            let movie = add_movie(movieData, title, p, sources)
+                            movie.paragraph_list.push(p);
+                            if(toAddLater.length !== 0) {
+                                movie.paragraph_list.push(toAddLater);
+                                toAddLater = [];
+                            }
+                            counter++;
+                        }
+                    }
+                });
+                paragraphSourceCounter.get(p).initial = counter;
+                paragraphSourceCounter.get(p).current = counter;
+            }
+        });
         // Sort the episode maps to be in episode order
         CATEGORY_ORDER.forEach(abbreviation => {
             if(abbreviation !== "FLM") {
