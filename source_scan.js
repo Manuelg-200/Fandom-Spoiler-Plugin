@@ -42,7 +42,9 @@ function Source_Scan() {
         const p_elements = mainText.querySelectorAll('p');
         // Used to store paragraphs that have no sources that need to be added together with the next paragraphs
         let toAddLater = []; 
-        p_elements.forEach(p => {
+        p_elements.forEach((p, index) => {
+            // Skip the first paragraph which holds the definition of the page topic
+            if(index === 0) return;
             // Select the <a> elements that link other wiki pages, these are the links to episodes/movies/series
             // that are sources to the current paragraph. The <span> element is the small pop up description
             // that appears when hovering over a source.
